@@ -1,0 +1,42 @@
+{
+	"editor.tokenColorCustomizations": {
+		"textMateRules": [
+			{
+				"scope": [
+					"variable.other.constant",
+					"variable.parameter",
+					"comment",
+					"variable.other.global"
+				],
+				"settings": {
+					"fontStyle": ""
+				}
+			},
+			{
+				"scope": [
+					"variable.parameter"
+				],
+				"settings": {
+					"foreground": "#F78C6C"
+				}
+			},
+			{
+				"scope": [
+					"variable.other.constant"
+				],
+				"settings": {
+					"foreground": "#F07178"
+				}
+			},
+			{
+				"scope": [
+					"variable.other.global"
+				],
+				"settings": {
+					"foreground": "#e54611"
+				}
+			}
+		],
+		"comments": "#16bda7"
+	}
+}
