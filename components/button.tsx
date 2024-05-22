@@ -7,7 +7,7 @@ type Props = {
 	text: string;
 };
 
-const FormButton: React.FC<Props> = ({ text }) => {
+const Button: React.FC<Props> = ({ text }) => {
 	const { pending } = useFormStatus();
 	return (
 		<button
@@ -18,4 +18,4 @@ const FormButton: React.FC<Props> = ({ text }) => {
 	);
 };
 
-export default FormButton;
+export default Button;
