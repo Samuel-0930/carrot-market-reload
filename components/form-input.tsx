@@ -3,7 +3,7 @@ type Props = {
 	type: string;
 	placeholder: string;
 	required: boolean;
-	errors: string[];
+	errors?: string[];
 	name: string;
 };
 
@@ -11,7 +11,7 @@ const FormInput: React.FC<Props> = ({
 	type,
 	placeholder,
 	required,
-	errors,
+	errors = [],
 	name,
 }) => {
 	return (
