@@ -1,39 +1,37 @@
 import FormButton from '@/components/form-btn';
 import FormInput from '@/components/form-input';
-import SocialLogin from '@/components/social-login';
 
 type Props = {
 	// props의 타입 정의
 };
 
-const Login: React.FC<Props> = () => {
+const SMSLogin: React.FC<Props> = () => {
 	return (
 		<div className='flex flex-col gap-10 py-8 px-6'>
 			<div className='flex flex-col gap-2 *:font-medium'>
-				<h1 className='text-2xl'>안녕하세요!</h1>
-				<h2 className='text-xl'>Log in with email and password.</h2>
+				<h1 className='text-2xl'>SMS Login!</h1>
+				<h2 className='text-xl'>Verify your phone number.</h2>
 			</div>
 			<form className='flex flex-col gap-3'>
 				<FormInput
-					type='email'
-					placeholder='Email'
+					type='number'
+					placeholder='Phone number'
 					required
 					errors={[]}
 				/>
 				<FormInput
-					type='password'
-					placeholder='Password'
+					type='number'
+					placeholder='Verification code'
 					required
 					errors={[]}
 				/>
 				<FormButton
 					loading={false}
-					text='Login'
+					text='Verify'
 				/>
 			</form>
-			<SocialLogin />
 		</div>
 	);
 };
 
-export default Login;
+export default SMSLogin;
