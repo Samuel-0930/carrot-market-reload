@@ -6,7 +6,16 @@ const config: Config = {
 		'./components/**/*.{js,ts,jsx,tsx,mdx}',
 		'./app/**/*.{js,ts,jsx,tsx,mdx}',
 	],
-	theme: {},
+	theme: {
+		extend: {
+			margin: {
+				tomato: '120px',
+			},
+			borderRadius: {
+				'sexy-name': '11.11px',
+			},
+		},
+	},
 	plugins: [require('@tailwindcss/forms'), require('daisyui')],
 };
 export default config;
