@@ -1,17 +1,17 @@
+'use client';
+
 import FormButton from '@/components/form-btn';
 import FormInput from '@/components/form-input';
 import SocialLogin from '@/components/social-login';
+import { useFormState } from 'react-dom';
+import { handleForm } from './action';
 
 type Props = {
 	// props의 타입 정의
 };
 
 const Login: React.FC<Props> = () => {
-	const handleForm = async (formData: FormData) => {
-		'use server';
-		console.log(formData.get('email'), formData.get('password'));
-		console.log('I run in the server baby!');
-	};
+	const [state, action] = useFormState(handleForm, null);
 
 	return (
 		<div className='flex flex-col gap-10 py-8 px-6'>
@@ -20,7 +20,7 @@ const Login: React.FC<Props> = () => {
 				<h2 className='text-xl'>Log in with email and password.</h2>
 			</div>
 			<form
-				action={handleForm}
+				action={action}
 				className='flex flex-col gap-3'>
 				<FormInput
 					name='email'
@@ -34,12 +34,9 @@ const Login: React.FC<Props> = () => {
 					type='password'
 					placeholder='Password'
 					required
-					errors={[]}
+					errors={state?.errors ?? []}
 				/>
-				<FormButton
-					loading={false}
-					text='Login'
-				/>
+				<FormButton text='Login' />
 			</form>
 			<SocialLogin />
 		</div>

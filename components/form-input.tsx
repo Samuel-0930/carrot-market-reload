@@ -27,7 +27,7 @@ const FormInput: React.FC<Props> = ({
 				<span
 					key={index}
 					className='text-red-500 font-medium'>
-					{errors}
+					{error}
 				</span>
 			))}
 		</div>
