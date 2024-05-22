@@ -4,6 +4,7 @@ type Props = {
 	placeholder: string;
 	required: boolean;
 	errors: string[];
+	name: string;
 };
 
 const FormInput: React.FC<Props> = ({
@@ -11,10 +12,12 @@ const FormInput: React.FC<Props> = ({
 	placeholder,
 	required,
 	errors,
+	name,
 }) => {
 	return (
 		<div className='flex flex-col gap-2'>
 			<input
+				name={name}
 				type={type}
 				placeholder={placeholder}
 				required={required}
