@@ -9,8 +9,13 @@ type Props = {
 	// props의 타입 정의
 };
 
+const initialState = {
+	token: false,
+	error: undefined,
+};
+
 const SMSLogin: React.FC<Props> = () => {
-	const [state, dispatch] = useFormState(smsLogin, null);
+	const [state, dispatch] = useFormState(smsLogin, initialState);
 	return (
 		<div className='flex flex-col gap-10 py-8 px-6'>
 			<div className='flex flex-col gap-2 *:font-medium'>
@@ -20,21 +25,25 @@ const SMSLogin: React.FC<Props> = () => {
 			<form
 				action={dispatch}
 				className='flex flex-col gap-3'>
-				<Input
-					name='phone'
-					type='number'
-					placeholder='Phone number'
-					required
-				/>
-				<Input
-					name='token'
-					type='number'
-					placeholder='Verification code'
-					required
-					min={100000}
-					max={999999}
-				/>
-				<Button text='Verify' />
+				{state.token ? (
+					<Input
+						name='token'
+						type='number'
+						placeholder='Verification code'
+						required
+						min={100000}
+						max={999999}
+					/>
+				) : (
+					<Input
+						name='phone'
+						type='number'
+						placeholder='Phone number'
+						required
+						errors={state.error?.formErrors}
+					/>
+				)}
+				<Button text={state.token ? 'Verify Token' : 'Send Verification SMS'} />
 			</form>
 		</div>
 	);
