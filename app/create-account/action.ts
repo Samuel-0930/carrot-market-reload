@@ -7,6 +7,9 @@ import {
 import { z } from 'zod';
 import db from '../../lib/db';
 import bcrypt from 'bcrypt';
+import { getIronSession } from 'iron-session';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 const checkUsername = (username: string) => !username.includes('potato');
 
@@ -64,8 +67,10 @@ const formSchema = z
 				checkUniqueEmail,
 				'There is an account already registered with that email'
 			),
-		password: z.string().min(PASSWORD_MIN_LENGTH),
-		// .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
+		password: z
+			.string()
+			.min(PASSWORD_MIN_LENGTH)
+			.regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
 		confirm_password: z.string().min(10),
 	})
 	.refine(checkPasswords, {
@@ -96,6 +101,13 @@ export async function createAccount(prevState: any, formData: FormData) {
 				id: true,
 			},
 		});
-		console.log(user);
+		const cookie = await getIronSession(cookies(), {
+			cookieName: 'delicious-carrot',
+			password: process.env.COOKIE_PASSWORD!,
+		});
+		//@ts-ignore
+		cookie.id = user.id;
+		await cookie.save();
+		redirect('/profile');
 	}
 }
