@@ -62,8 +62,10 @@ export async function GET(request: NextRequest) {
 		return redirect('/profile');
 	}
 
+	let count = 1;
+
 	while (true) {
-		let count = 1;
+		console.log(count);
 		const newUsername = login + `#${count}`;
 		const dbUser = await db.user.findUnique({
 			where: {
@@ -88,6 +90,8 @@ export async function GET(request: NextRequest) {
 
 			await userLogin(newUser);
 			return redirect('/profile');
+		} else {
+			count++;
 		}
 	}
 }
