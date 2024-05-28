@@ -2,7 +2,6 @@ import { notFound, redirect } from 'next/navigation';
 import { NextRequest } from 'next/server';
 import db from '../../../lib/db';
 import getGithubAccessToken from '../../../lib/getGithubAccessToken';
-import getGithubUserEmail from '../../../lib/getGithubUserEmail';
 import getGithubUserData from '../../../lib/getGithubUserProfile';
 import userLogin from '../../../lib/userLogin';
 
