@@ -29,7 +29,7 @@ const CreateAccount: React.FC<Props> = () => {
 					required
 					errors={state?.fieldErrors.username}
 					minLength={3}
-					maxLength={10}
+					maxLength={15}
 				/>
 				<Input
 					name='email'

@@ -9,6 +9,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import db from '../../lib/db';
 import getSession from '../../lib/session';
+import userLogin from '../../lib/userLogin';
 
 const checkUsername = (username: string) => !username.includes('potato');
 
@@ -28,7 +29,7 @@ const formSchema = z
 				required_error: 'Where is my username?',
 			})
 			.min(3, 'Way too short!!!')
-			.max(10, 'That is too looooooong!')
+			.max(15, 'That is too looooooong!')
 			.toLowerCase()
 			.trim()
 			// .transform((username) => `🔥 ${username} 🔥`)
@@ -107,10 +108,7 @@ export async function createAccount(prevState: any, formData: FormData) {
 			},
 		});
 
-		const session = await getSession();
-
-		session.id = user.id;
-		await session.save();
+		await userLogin(user);
 		redirect('/profile');
 	}
 }

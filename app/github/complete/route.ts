@@ -1,42 +1,27 @@
 import { notFound, redirect } from 'next/navigation';
 import { NextRequest } from 'next/server';
 import db from '../../../lib/db';
-import getSession from '../../../lib/session';
+import getGithubAccessToken from '../../../lib/getGithubAccessToken';
+import getGithubUserEmail from '../../../lib/getGithubUserEmail';
+import getGithubUserData from '../../../lib/getGithubUserProfile';
+import userLogin from '../../../lib/userLogin';
 
 export async function GET(request: NextRequest) {
 	const code = request.nextUrl.searchParams.get('code');
+
 	if (!code) {
 		return notFound();
 	}
 
-	const accessTokenParams = new URLSearchParams({
-		client_id: process.env.GITHUB_CLIENT_ID!,
-		client_secret: process.env.GITHUB_CLIENT_SECRET!,
-		code,
-	}).toString();
+	const { error, access_token } = await getGithubAccessToken(code);
 
-	const accessTokenURL = `https://github.com/login/oauth/access_token?${accessTokenParams}`;
-
-	const accessTokenResponse = await fetch(accessTokenURL, {
-		method: 'POST',
-		headers: {
-			Accept: 'application/json',
-		},
-	});
-	const { error, access_token } = await accessTokenResponse.json();
 	if (error) {
 		return new Response(null, {
 			status: 400,
 		});
 	}
-	const userProfileResponse = await fetch('https://api.github.com/user', {
-		headers: {
-			Authorization: `Bearer ${access_token}`,
-		},
-		cache: 'no-cache',
-	});
 
-	const { id, avatar_url, login } = await userProfileResponse.json();
+	const { id, avatar_url, login } = await getGithubUserData(access_token);
 
 	const user = await db.user.findUnique({
 		where: {
@@ -48,25 +33,61 @@ export async function GET(request: NextRequest) {
 	});
 
 	if (user) {
-		const session = await getSession();
-		session.id = user.id;
-		await session.save();
+		await userLogin(user);
 		return redirect('/profile');
 	}
 
-	const newUser = await db.user.create({
-		data: {
-			github_id: id + '',
-			avatar: avatar_url,
-			username: login,
+	const dbUser = await db.user.findUnique({
+		where: {
+			username: login.toLowerCase(),
 		},
 		select: {
 			id: true,
 		},
 	});
 
-	const session = await getSession();
-	session.id = newUser.id;
-	await session.save();
-	return redirect('/profile');
+	if (!dbUser) {
+		const newUser = await db.user.create({
+			data: {
+				github_id: id + '',
+				avatar: avatar_url,
+				username: login.toLowerCase(),
+			},
+			select: {
+				id: true,
+			},
+		});
+
+		await userLogin(newUser);
+		return redirect('/profile');
+	}
+
+	while (true) {
+		let count = 1;
+		const newUsername = login + `#${count}`;
+		const dbUser = await db.user.findUnique({
+			where: {
+				username: newUsername.toLowerCase(),
+			},
+			select: {
+				id: true,
+			},
+		});
+
+		if (!dbUser) {
+			const newUser = await db.user.create({
+				data: {
+					github_id: id + '',
+					avatar: avatar_url,
+					username: newUsername.toLowerCase(),
+				},
+				select: {
+					id: true,
+				},
+			});
+
+			await userLogin(newUser);
+			return redirect('/profile');
+		}
+	}
 }
