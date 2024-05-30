@@ -108,7 +108,7 @@ export async function createAccount(prevState: any, formData: FormData) {
 			},
 		});
 
-		await userLogin(user);
+		await userLogin(user.id);
 		redirect('/profile');
 	}
 }

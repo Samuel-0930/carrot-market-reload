@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
 	});
 
 	if (user) {
-		await userLogin(user);
+		await userLogin(user.id);
 		return redirect('/profile');
 	}
 
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 			},
 		});
 
-		await userLogin(newUser);
+		await userLogin(newUser.id);
 		return redirect('/profile');
 	}
 
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
 				},
 			});
 
-			await userLogin(newUser);
+			await userLogin(newUser.id);
 			return redirect('/profile');
 		} else {
 			count++;

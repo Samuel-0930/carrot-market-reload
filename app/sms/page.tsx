@@ -25,24 +25,27 @@ const SMSLogin: React.FC<Props> = () => {
 			<form
 				action={dispatch}
 				className='flex flex-col gap-3'>
-				<Input
-					name='phone'
-					type='number'
-					placeholder='Phone number'
-					required
-					errors={state.error?.formErrors}
-					className=''
-				/>
-				<Input
-					name='token'
-					type='number'
-					placeholder='Verification code'
-					required
-					min={100000}
-					max={999999}
-					disabled={!state.token}
-					className='disabled:cursor-not-allowed'
-				/>
+				{!state.token ? (
+					<Input
+						name='phone'
+						type='number'
+						placeholder='Phone number'
+						required
+						errors={state.error?.formErrors}
+					/>
+				) : (
+					<Input
+						name='token'
+						type='number'
+						placeholder='Verification code'
+						required
+						min={100000}
+						max={999999}
+						disabled={!state.token}
+						className='disabled:cursor-not-allowed'
+						errors={state.error?.formErrors}
+					/>
+				)}
 				<Button text={state.token ? 'Verify Token' : 'Send Verification SMS'} />
 			</form>
 		</div>
