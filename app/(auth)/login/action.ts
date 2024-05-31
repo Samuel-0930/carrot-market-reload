@@ -8,9 +8,9 @@ import {
 import bcrypt from 'bcrypt';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import db from '../../lib/db';
-import getSession from '../../lib/session';
-import userLogin from '../../lib/userLogin';
+
+import userLogin from '../../../lib/userLogin';
+import db from '../../../lib/db';
 
 const checkEmailExists = async (email: string) => {
 	const user = await db.user.findUnique({
@@ -58,7 +58,7 @@ export const login = async (prevState: any, formData: FormData) => {
 		});
 		const ok = await bcrypt.compare(result.data.password, user!.password ?? '');
 		if (ok) {
-			await userLogin(user!);
+			await userLogin(user!.id);
 			redirect('/profile');
 		} else {
 			return {

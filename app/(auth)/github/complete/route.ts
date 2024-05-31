@@ -1,9 +1,9 @@
 import { notFound, redirect } from 'next/navigation';
 import { NextRequest } from 'next/server';
-import db from '../../../lib/db';
-import getGithubAccessToken from '../../../lib/getGithubAccessToken';
-import getGithubUserData from '../../../lib/getGithubUserProfile';
-import userLogin from '../../../lib/userLogin';
+import getGithubAccessToken from '../../../../lib/getGithubAccessToken';
+import getGithubUserData from '../../../../lib/getGithubUserProfile';
+import userLogin from '../../../../lib/userLogin';
+import db from '../../../../lib/db';
 
 export async function GET(request: NextRequest) {
 	const code = request.nextUrl.searchParams.get('code');

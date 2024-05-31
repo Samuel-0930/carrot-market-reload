@@ -7,9 +7,8 @@ import {
 import bcrypt from 'bcrypt';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import db from '../../lib/db';
-import getSession from '../../lib/session';
-import userLogin from '../../lib/userLogin';
+import db from '../../../lib/db';
+import userLogin from '../../../lib/userLogin';
 
 const checkUsername = (username: string) => !username.includes('potato');
 
