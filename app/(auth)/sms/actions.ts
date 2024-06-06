@@ -3,10 +3,12 @@
 import { z } from 'zod';
 import validator from 'validator';
 import { redirect } from 'next/navigation';
-import db from '../../lib/db';
+
 import crypto from 'crypto';
-import userLogin from '../../lib/userLogin';
+
 import twilio from 'twilio';
+import db from '../../../lib/db';
+import userLogin from '../../../lib/userLogin';
 
 const phoneSchema = z
 	.string()

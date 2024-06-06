@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { formatToTomeAgo, formatToWon } from '../lib/utils';
 
 type Props = {
 	// props의 타입 정의title
@@ -32,9 +33,9 @@ const ListProduct: React.FC<Props> = ({
 			<div className='flex flex-col gap-1 *:text-white'>
 				<span className='text-lg'>{title}</span>
 				<span className='text-sm text-neutral-500'>
-					{created_at.toString()}
+					{formatToTomeAgo(created_at.toString())}
 				</span>
-				<span className='text-lg font-semibold'>{price}</span>
+				<span className='text-lg font-semibold'>{formatToWon(price)}원</span>
 			</div>
 		</Link>
 	);
