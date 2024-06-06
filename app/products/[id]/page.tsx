@@ -1,7 +1,7 @@
 import { UserIcon } from '@heroicons/react/24/solid';
 import Image from 'next/image';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import db from '../../../lib/db';
 import getSession from '../../../lib/session';
 import { formatToWon } from '../../../lib/utils';
@@ -50,6 +50,18 @@ const ProductDetail: React.FC<Props> = async ({ params }) => {
 
 	const isOwner = await getIsOwner(product.userId);
 
+	const deleteProduct = async () => {
+		'use server';
+		if (!isOwner) return;
+
+		await db.product.delete({
+			where: {
+				id: product.id,
+			},
+		});
+		redirect('/products');
+	};
+
 	return (
 		<div>
 			<div className='relative aspect-square'>
@@ -85,9 +97,11 @@ const ProductDetail: React.FC<Props> = async ({ params }) => {
 					{formatToWon(product.price)}원
 				</span>
 				{isOwner ? (
-					<button className='bg-red-500 hover:bg-red-400 transition-colors px-5 py-2.5 rounded-md text-white font-semibold'>
-						Delete product
-					</button>
+					<form action={deleteProduct}>
+						<button className='bg-red-500 hover:bg-red-400 transition-colors px-5 py-2.5 rounded-md text-white font-semibold'>
+							Delete product
+						</button>
+					</form>
 				) : null}
 				<Link
 					className='bg-orange-500 hover:bg-orange-400 transition-colors px-5 py-2.5 rounded-md text-white font-semibold'
