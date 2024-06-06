@@ -1,10 +1,10 @@
+import { UserIcon } from '@heroicons/react/24/solid';
+import Image from 'next/image';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import db from '../../../lib/db';
 import getSession from '../../../lib/session';
-import Image from 'next/image';
-import { UserIcon } from '@heroicons/react/24/solid';
 import { formatToWon } from '../../../lib/utils';
-import Link from 'next/link';
 
 type Props = {
 	// props의 타입 정의
@@ -80,17 +80,17 @@ const ProductDetail: React.FC<Props> = async ({ params }) => {
 				<h1 className='text-2xl font-semibold'>{product.title}</h1>
 				<p>{product.description}</p>
 			</div>
-			<div className='fixed w-full bottom-0 left-0 p-5 pb-10 bg-neutral-800 flex justify-between items-center'>
+			<div className='fixed max-w-screen-sm w-full bottom-0 p-5 pb-5 bg-neutral-800 flex justify-between items-center'>
 				<span className='font-semibold text-xl'>
 					{formatToWon(product.price)}원
 				</span>
 				{isOwner ? (
-					<button className='bg-red-500 px-5 py-2.5 rounded-md text-white font-semibold'>
+					<button className='bg-red-500 hover:bg-red-400 transition-colors px-5 py-2.5 rounded-md text-white font-semibold'>
 						Delete product
 					</button>
 				) : null}
 				<Link
-					className='bg-orange-500 px-5 py-2.5 rounded-md text-white font-semibold'
+					className='bg-orange-500 hover:bg-orange-400 transition-colors px-5 py-2.5 rounded-md text-white font-semibold'
 					href={``}>
 					채팅하기
 				</Link>
