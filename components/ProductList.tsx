@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { InitialProducts } from '../app/(tabs)/products/page';
 import ListProduct from './ListProduct';
 import { setLazyProp } from 'next/dist/server/api-utils';
@@ -16,17 +16,42 @@ const ProductList: React.FC<Props> = ({ initialProducts }) => {
 	const [loading, setLoading] = useState(false);
 	const [page, setPage] = useState(0);
 	const [lastPage, setLastPage] = useState(false);
-	const onLoadMoreClick = async () => {
-		setLoading(true);
-		const newProducts = await getMoreProducts(page + 1);
-		if (newProducts.length !== 0) {
-			setPage((prev) => prev + 1);
-			setProducts((prev) => [...prev, ...newProducts]);
-		} else {
-			setLastPage(true);
+
+	const trigger = useRef<HTMLSpanElement>(null);
+
+	useEffect(() => {
+		const observer = new IntersectionObserver(
+			async (
+				entries: IntersectionObserverEntry[],
+				observer: IntersectionObserver
+			) => {
+				const element = entries[0];
+				if (element.isIntersecting && trigger.current) {
+					observer.unobserve(trigger.current);
+					setLoading(true);
+					const newProducts = await getMoreProducts(page + 1);
+					if (newProducts.length !== 0) {
+						setPage((prev) => prev + 1);
+						setProducts((prev) => [...prev, ...newProducts]);
+					} else {
+						setLastPage(true);
+					}
+					setLoading(false);
+				}
+			},
+			{
+				threshold: 0.5,
+				rootMargin: '0px 0px -100px 0px',
+			}
+		);
+		if (trigger.current) {
+			observer.observe(trigger.current);
 		}
-		setLoading(false);
-	};
+
+		return () => {
+			observer.disconnect();
+		};
+	}, [page]);
 
 	return (
 		<div className='p-5 flex flex-col gap-5'>
@@ -36,15 +61,13 @@ const ProductList: React.FC<Props> = ({ initialProducts }) => {
 					{...product}
 				/>
 			))}
-			{!lastPage ? (
-				<button
-					onClick={onLoadMoreClick}
-					disabled={loading}
-					className='text-sm font-semibold bg-orange-500 w-fit mx-auto px-3 py-2 rounded-md hover:opacity-90 active:scale-95'>
+			{!lastPage && (
+				<span
+					ref={trigger}
+					style={{ marginTop: `${(page + 1) * 300}vh` }}
+					className='mb-96 text-sm font-semibold bg-orange-500 w-fit mx-auto px-3 py-2 rounded-md hover:opacity-90 active:scale-95'>
 					{loading ? '로딩 중' : 'Load more'}
-				</button>
-			) : (
-				<span>No more items</span>
+				</span>
 			)}
 		</div>
 	);
