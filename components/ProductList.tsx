@@ -64,8 +64,7 @@ const ProductList: React.FC<Props> = ({ initialProducts }) => {
 			{!lastPage && (
 				<span
 					ref={trigger}
-					style={{ marginTop: `${(page + 1) * 300}vh` }}
-					className='mb-96 text-sm font-semibold bg-orange-500 w-fit mx-auto px-3 py-2 rounded-md hover:opacity-90 active:scale-95'>
+					className='text-sm font-semibold bg-orange-500 w-fit mx-auto px-3 py-2 rounded-md hover:opacity-90 active:scale-95'>
 					{loading ? '로딩 중' : 'Load more'}
 				</span>
 			)}
