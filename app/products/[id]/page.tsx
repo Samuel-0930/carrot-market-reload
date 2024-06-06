@@ -66,6 +66,7 @@ const ProductDetail: React.FC<Props> = async ({ params }) => {
 		<div>
 			<div className='relative aspect-square'>
 				<Image
+					className='object-cover'
 					fill
 					src={product.photo}
 					alt={product.title}
