@@ -4,12 +4,12 @@ import Button from '@/components/button';
 import Input from '@/components/input';
 import { PhotoIcon } from '@heroicons/react/24/solid';
 import { useState } from 'react';
-import uploadProduct from './action';
+import { uploadProduct } from './action';
 import { useFormState } from 'react-dom';
 
 export default function AddProduct() {
 	const [preview, setPreview] = useState('');
-	const onImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+	const onImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
 		const {
 			target: { files },
 		} = event;
@@ -26,7 +26,35 @@ export default function AddProduct() {
 
 		setPreview(url);
 	};
-	const [state, dispatch] = useFormState(uploadProduct, null);
+
+	const interceptAction = async (_: any, formData: FormData) => {
+		const file = formData.get('photo');
+		if (!file) {
+			return;
+		}
+		const cloudinaryForm = new FormData();
+		cloudinaryForm.append('file', file);
+		cloudinaryForm.append('upload_preset', 'qvmdrft7');
+
+		const response = await fetch(
+			`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+			{
+				method: 'POST',
+				body: cloudinaryForm,
+			}
+		);
+		if (response.status !== 200) {
+			return;
+		}
+		const data = await response.json();
+		console.log(data);
+		const photoUrl = data.secure_url;
+		formData.set('photo', photoUrl);
+
+		return uploadProduct(_, formData);
+	};
+
+	const [state, dispatch] = useFormState(interceptAction, null);
 	return (
 		<div>
 			<form

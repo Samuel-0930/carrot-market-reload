@@ -21,7 +21,7 @@ const productSchema = z.object({
 	}),
 });
 
-const uploadProduct = async (_: any, formData: FormData) => {
+export const uploadProduct = async (_: any, formData: FormData) => {
 	const data = {
 		photo: formData.get('photo'),
 		title: formData.get('title'),
@@ -60,5 +60,3 @@ const uploadProduct = async (_: any, formData: FormData) => {
 	}
 	console.log(data);
 };
-
-export default uploadProduct;
