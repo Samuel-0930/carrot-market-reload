@@ -23,7 +23,7 @@ export default function RootLayout({
 	return (
 		<html lang='en'>
 			<body
-				className={`$${inter.className} min-h-[100vh] bg-neutral-900 text-white max-w-screen-sm mx-auto`}>
+				className={`${inter.className} min-h-[100vh] bg-neutral-900 text-white max-w-screen-sm mx-auto`}>
 				{children}
 			</body>
 		</html>
