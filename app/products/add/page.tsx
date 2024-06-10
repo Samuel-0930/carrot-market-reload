@@ -6,9 +6,24 @@ import { PhotoIcon } from '@heroicons/react/24/solid';
 import { useState } from 'react';
 import { uploadProduct } from './action';
 import { useFormState } from 'react-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ProductType, productSchema } from './schema';
 
 export default function AddProduct() {
 	const [preview, setPreview] = useState('');
+	const [file, setFile] = useState<File | null>(null);
+
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+		setValue,
+		setError,
+	} = useForm<ProductType>({
+		resolver: zodResolver(productSchema),
+	});
+
 	const onImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
 		const {
 			target: { files },
@@ -25,13 +40,15 @@ export default function AddProduct() {
 		const url = URL.createObjectURL(file);
 
 		setPreview(url);
+		setFile(file);
+		setValue('photo', url);
 	};
 
-	const interceptAction = async (_: any, formData: FormData) => {
-		const file = formData.get('photo');
+	const onSubmit = handleSubmit(async (data: ProductType) => {
 		if (!file) {
 			return;
 		}
+
 		const cloudinaryForm = new FormData();
 		cloudinaryForm.append('file', file);
 		cloudinaryForm.append('upload_preset', 'qvmdrft7');
@@ -46,19 +63,30 @@ export default function AddProduct() {
 		if (response.status !== 200) {
 			return;
 		}
-		const data = await response.json();
-		console.log(data);
-		const photoUrl = data.secure_url;
-		formData.set('photo', photoUrl);
+		const dataJson = await response.json();
+		const photoUrl = dataJson.secure_url;
 
-		return uploadProduct(_, formData);
+		const formData = new FormData();
+
+		formData.append('title', data.title);
+		formData.append('price', data.price + '');
+		formData.append('description', data.description);
+		formData.append('photo', photoUrl);
+
+		const errors = await uploadProduct(formData);
+		if (errors) {
+			// setError("")
+		}
+	});
+
+	const onValid = async () => {
+		await onSubmit();
 	};
 
-	const [state, dispatch] = useFormState(interceptAction, null);
 	return (
 		<div>
 			<form
-				action={dispatch}
+				action={onValid}
 				className='p-5 flex flex-col gap-5'>
 				<label
 					htmlFor='photo'
@@ -68,7 +96,7 @@ export default function AddProduct() {
 						<>
 							<PhotoIcon className='w-20' />
 							<div className='text-neutral-400 text-sm'>
-								사진을 추가해주세요.
+								{errors.photo?.message}
 							</div>
 						</>
 					)}
@@ -82,25 +110,25 @@ export default function AddProduct() {
 					className='hidden'
 				/>
 				<Input
-					name='title'
 					required
 					placeholder='제목'
 					type='text'
-					errors={state?.fieldErrors.title}
+					{...register('title')}
+					errors={[errors.title?.message ?? '']}
 				/>
 				<Input
-					name='price'
 					type='number'
 					required
 					placeholder='가격'
-					errors={state?.fieldErrors.price}
+					{...register('price')}
+					errors={[errors.price?.message ?? '']}
 				/>
 				<Input
-					name='description'
 					type='text'
 					required
 					placeholder='자세한 설명'
-					errors={state?.fieldErrors.description}
+					{...register('description')}
+					errors={[errors.description?.message ?? '']}
 				/>
 				<Button text='작성 완료' />
 			</form>
