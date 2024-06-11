@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { InitialProducts } from '../app/(tabs)/products/page';
+import { InitialProducts } from '../app/(tabs)/home/page';
 import ListProduct from './ListProduct';
 import { setLazyProp } from 'next/dist/server/api-utils';
-import getMoreProducts from '../app/(tabs)/products/action';
+import getMoreProducts from '../app/(tabs)/home/action';
 import { set } from 'zod';
 
 type Props = {
