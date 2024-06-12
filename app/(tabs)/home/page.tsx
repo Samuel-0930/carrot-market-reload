@@ -14,7 +14,7 @@ const getInitialProducts = async () => {
 			photo: true,
 			id: true,
 		},
-		take: 1,
+		// take: 1,
 		orderBy: {
 			created_at: 'desc',
 		},
@@ -25,6 +25,10 @@ const getInitialProducts = async () => {
 export type InitialProducts = Prisma.PromiseReturnType<
 	typeof getInitialProducts
 >;
+
+export const metadata = {
+	title: 'Home',
+};
 
 export default async function Products() {
 	const initialProducts = await getInitialProducts();

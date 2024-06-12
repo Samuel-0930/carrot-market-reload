@@ -15,8 +15,8 @@ const ModalCloseButton: React.FC<Props> = () => {
 	return (
 		<button
 			onClick={onClick}
-			className='absolute right-5 top-5 text-neutral-200'>
-			<XMarkIcon className='size-10' />
+			className='absolute right-0 top-0 z-50 text-neutral-800'>
+			<XMarkIcon className='size-8' />
 		</button>
 	);
 };

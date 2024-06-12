@@ -35,6 +35,13 @@ const getProduct = async (id: number) => {
 	return product;
 };
 
+export async function generateMetadata({ params }: { params: { id: string } }) {
+	const product = await getProduct(+params.id);
+	return {
+		title: product?.title,
+	};
+}
+
 const ProductDetail: React.FC<Props> = async ({ params }) => {
 	const id = Number(params.id);
 
