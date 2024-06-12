@@ -5,6 +5,7 @@ import { notFound, redirect } from 'next/navigation';
 import db from '../../../lib/db';
 import getSession from '../../../lib/session';
 import { formatToWon } from '../../../lib/utils';
+import { unstable_cache as nextCache, revalidateTag } from 'next/cache';
 
 type Props = {
 	// props의 타입 정의
@@ -19,6 +20,7 @@ const getIsOwner = async (userId: number) => {
 };
 
 const getProduct = async (id: number) => {
+	console.log('product');
 	const product = await db.product.findUnique({
 		where: {
 			id,
@@ -35,8 +37,29 @@ const getProduct = async (id: number) => {
 	return product;
 };
 
+const getCachedProduct = nextCache(getProduct, ['product-detail'], {
+	tags: ['product-detail'],
+});
+
+const getProductTitle = async (id: number) => {
+	console.log('title');
+	const product = await db.product.findUnique({
+		where: {
+			id,
+		},
+		select: {
+			title: true,
+		},
+	});
+	return product;
+};
+
+const getCachedProductTitle = nextCache(getProductTitle, ['product-title'], {
+	tags: ['product-title'],
+});
+
 export async function generateMetadata({ params }: { params: { id: string } }) {
-	const product = await getProduct(+params.id);
+	const product = await getCachedProductTitle(+params.id);
 	return {
 		title: product?.title,
 	};
@@ -49,7 +72,7 @@ const ProductDetail: React.FC<Props> = async ({ params }) => {
 		return notFound();
 	}
 
-	const product = await getProduct(id);
+	const product = await getCachedProduct(id);
 
 	if (!product) {
 		return notFound();
@@ -67,6 +90,11 @@ const ProductDetail: React.FC<Props> = async ({ params }) => {
 			},
 		});
 		redirect('/products');
+	};
+
+	const revalidate = async () => {
+		'use server';
+		revalidateTag('product-title');
 	};
 
 	return (
@@ -105,9 +133,9 @@ const ProductDetail: React.FC<Props> = async ({ params }) => {
 					{formatToWon(product.price)}원
 				</span>
 				{isOwner ? (
-					<form action={deleteProduct}>
+					<form action={revalidate}>
 						<button className='bg-red-500 hover:bg-red-400 transition-colors px-5 py-2.5 rounded-md text-white font-semibold'>
-							Delete product
+							Revalidate title cache
 						</button>
 					</form>
 				) : null}
