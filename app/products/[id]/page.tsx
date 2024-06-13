@@ -149,6 +149,8 @@ const ProductDetail: React.FC<Props> = async ({ params }) => {
 	);
 };
 
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
 	const products = await db.product.findMany({
 		select: {
