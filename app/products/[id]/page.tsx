@@ -13,10 +13,10 @@ type Props = {
 };
 
 const getIsOwner = async (userId: number) => {
-	const session = await getSession();
-	if (session.id) {
-		return session.id === userId;
-	}
+	// const session = await getSession();
+	// if (session.id) {
+	// 	return session.id === userId;
+	// }
 };
 
 const getProduct = async (id: number) => {
@@ -80,22 +80,22 @@ const ProductDetail: React.FC<Props> = async ({ params }) => {
 
 	const isOwner = await getIsOwner(product.userId);
 
-	const deleteProduct = async () => {
-		'use server';
-		if (!isOwner) return;
+	// const deleteProduct = async () => {
+	// 	'use server';
+	// 	if (!isOwner) return;
 
-		await db.product.delete({
-			where: {
-				id: product.id,
-			},
-		});
-		redirect('/products');
-	};
+	// 	await db.product.delete({
+	// 		where: {
+	// 			id: product.id,
+	// 		},
+	// 	});
+	// 	redirect('/products');
+	// };
 
-	const revalidate = async () => {
-		'use server';
-		revalidateTag('product-title');
-	};
+	// const revalidate = async () => {
+	// 	'use server';
+	// 	revalidateTag('product-title');
+	// };
 
 	return (
 		<div>
@@ -132,13 +132,13 @@ const ProductDetail: React.FC<Props> = async ({ params }) => {
 				<span className='font-semibold text-xl'>
 					{formatToWon(product.price)}원
 				</span>
-				{isOwner ? (
+				{/* {isOwner ? (
 					<form action={revalidate}>
 						<button className='bg-red-500 hover:bg-red-400 transition-colors px-5 py-2.5 rounded-md text-white font-semibold'>
 							Revalidate title cache
 						</button>
 					</form>
-				) : null}
+				) : null} */}
 				<Link
 					className='bg-orange-500 hover:bg-orange-400 transition-colors px-5 py-2.5 rounded-md text-white font-semibold'
 					href={``}>
@@ -148,5 +148,15 @@ const ProductDetail: React.FC<Props> = async ({ params }) => {
 		</div>
 	);
 };
+
+export async function generateStaticParams() {
+	const products = await db.product.findMany({
+		select: {
+			id: true,
+		},
+	});
+
+	return products.map((products) => ({ id: products.id + '' }));
+}
 
 export default ProductDetail;
