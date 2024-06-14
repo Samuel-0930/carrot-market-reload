@@ -3,17 +3,18 @@
 import Button from '@/components/button';
 import Input from '@/components/input';
 import { PhotoIcon } from '@heroicons/react/24/solid';
-import { useState } from 'react';
-import { uploadProduct } from './action';
-import { useFormState } from 'react-dom';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ProductType, productSchema } from './schema';
 import { revalidatePath } from 'next/cache';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { editProduct } from '../../add/action';
+import { ProductType, productSchema } from '../../add/schema';
+import { useParams } from 'next/navigation';
 
-export default function AddProduct() {
+export default function EditProduct() {
 	const [preview, setPreview] = useState('');
 	const [file, setFile] = useState<File | null>(null);
+	const { id } = useParams();
 
 	const {
 		register,
@@ -75,11 +76,12 @@ export default function AddProduct() {
 		formData.append('description', data.description);
 		formData.append('photo', photoUrl);
 
-		const errors = await uploadProduct(formData);
-
+		const errors = await editProduct(formData, +id);
 		if (errors) {
 			// setError("")
 		}
+		revalidatePath('/home');
+		revalidatePath('/products/[id]', 'page');
 	});
 
 	const onValid = async () => {

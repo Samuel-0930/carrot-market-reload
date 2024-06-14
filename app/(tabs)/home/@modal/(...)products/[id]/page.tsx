@@ -1,8 +1,8 @@
-import { PhotoIcon, UserIcon } from '@heroicons/react/24/solid';
+import { UserIcon } from '@heroicons/react/24/solid';
+import Image from 'next/image';
+import { notFound } from 'next/navigation';
 import ModalCloseButton from '../../../../../../components/ModalCloseButton';
 import db from '../../../../../../lib/db';
-import { notFound } from 'next/navigation';
-import Image from 'next/image';
 import { formatToWon } from '../../../../../../lib/utils';
 
 export default async function Modal({ params }: { params: { id: string } }) {

@@ -1,5 +1,6 @@
 'use server';
 
+import { ITEMS_PER_PAGE } from '../../../lib/constants';
 import db from '../../../lib/db';
 
 const getMoreProducts = async (page: number) => {
@@ -11,8 +12,8 @@ const getMoreProducts = async (page: number) => {
 			photo: true,
 			id: true,
 		},
-		skip: page * 1,
-		take: 1,
+		skip: page * ITEMS_PER_PAGE,
+		take: ITEMS_PER_PAGE,
 		orderBy: {
 			created_at: 'desc',
 		},
