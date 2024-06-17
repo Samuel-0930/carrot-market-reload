@@ -10,6 +10,7 @@ import {
   unstable_cache as nextCache,
   revalidateTag,
 } from "next/cache";
+import LikeButton from "../../../components/LikeButton";
 
 type Props = {
   params: {
@@ -96,40 +97,6 @@ const PostDetail: React.FC<Props> = async ({ params }) => {
     return notFound();
   }
 
-  const likePost = async () => {
-    "use server";
-
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-    const session = await getSession();
-    try {
-      await db.like.create({
-        data: {
-          postId: id,
-          userId: session.id!,
-        },
-      });
-      revalidateTag(`like-status-${id}`);
-    } catch (e) {}
-  };
-
-  const dislikePost = async () => {
-    "use server";
-    const session = await getSession();
-    try {
-      await db.like.delete({
-        where: {
-          id: {
-            postId: id,
-            userId: session.id!,
-          },
-        },
-      });
-      revalidateTag(`like-status-${id}`);
-    } catch (e) {}
-  };
-
-  const session = await getSession();
-
   const { likeCount, isLiked } = await getCachedLikeStatus(id);
 
   return (
@@ -156,22 +123,7 @@ const PostDetail: React.FC<Props> = async ({ params }) => {
           <EyeIcon className="size-5" />
           <span>조회 {post.views}</span>
         </div>
-        <form action={isLiked ? dislikePost : likePost}>
-          <button
-            className={`flex items-center gap-2 rounded-full border border-neutral-400 p-2 text-sm text-neutral-400 transition-colors ${isLiked ? "border-orange-500 bg-orange-500 text-white" : "hover:bg-neutral-800"}`}
-          >
-            {isLiked ? (
-              <HandThumbUpIcon className="size-5" />
-            ) : (
-              <OutlineHandThumbUpIcon className="size-5" />
-            )}
-            {isLiked ? (
-              <span>{likeCount}</span>
-            ) : (
-              <span>공감하기 ({likeCount})</span>
-            )}
-          </button>
-        </form>
+        <LikeButton isLiked={isLiked} likeCount={likeCount} postId={id} />
       </div>
     </div>
   );
