@@ -12,6 +12,8 @@ type Props = {
   initialMessages: InitialChatMessages;
   userId: number;
   chatRoomId: string;
+  username: string;
+  avatar: string;
 };
 
 const SUPABASE_PUBLIC_KEY =
@@ -22,6 +24,8 @@ const ChatMessagesList: React.FC<Props> = ({
   initialMessages,
   userId,
   chatRoomId,
+  username,
+  avatar,
 }) => {
   const [messages, setMessages] = useState(initialMessages);
   const [message, setMessage] = useState("");
@@ -50,7 +54,16 @@ const ChatMessagesList: React.FC<Props> = ({
     channel.current?.send({
       type: "broadcast",
       event: "message",
-      payload: { message },
+      payload: {
+        id: Date.now(),
+        created_at: new Date(),
+        payload: message,
+        userId,
+        user: {
+          username,
+          avatar,
+        },
+      },
     });
     setMessage("");
   };
@@ -60,7 +73,7 @@ const ChatMessagesList: React.FC<Props> = ({
     channel.current = client.channel(`room-${chatRoomId}`);
     channel.current
       .on("broadcast", { event: "message" }, (payload) => {
-        console.log(payload);
+        setMessages((prev) => [...prev, payload.payload]);
       })
       .subscribe();
     return () => {
