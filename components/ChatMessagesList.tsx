@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowUpCircleIcon, UserIcon } from "@heroicons/react/24/solid";
 import { InitialChatMessages } from "../app/chats/[id]/page";
 import Image from "next/image";
 import { formatToTomeAgo } from "../lib/utils";
-import { createClient } from "@supabase/supabase-js";
+import { RealtimeChannel, createClient } from "@supabase/supabase-js";
 
 type Props = {
   // props의 타입 정의
@@ -25,6 +25,7 @@ const ChatMessagesList: React.FC<Props> = ({
 }) => {
   const [messages, setMessages] = useState(initialMessages);
   const [message, setMessage] = useState("");
+  const channel = useRef<RealtimeChannel>();
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {
       target: { value },
@@ -46,16 +47,26 @@ const ChatMessagesList: React.FC<Props> = ({
         },
       },
     ]);
+    channel.current?.send({
+      type: "broadcast",
+      event: "message",
+      payload: { message },
+    });
     setMessage("");
   };
 
   useEffect(() => {
     const client = createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY);
-    const channel = client.channel(`room-${chatRoomId}`);
-    channel.on("broadcast", { event: "message" }, (payload) => {
-      console.log(payload);
-    });
-  }, []);
+    channel.current = client.channel(`room-${chatRoomId}`);
+    channel.current
+      .on("broadcast", { event: "message" }, (payload) => {
+        console.log(payload);
+      })
+      .subscribe();
+    return () => {
+      channel.current?.unsubscribe();
+    };
+  }, [chatRoomId]);
 
   return (
     <div className={`flex min-h-screen flex-col justify-end gap-5 p-5`}>
@@ -65,7 +76,7 @@ const ChatMessagesList: React.FC<Props> = ({
           className={`flex items-start gap-2 ${message.userId === userId && "justify-end"}`}
         >
           {message.userId !== userId &&
-            (message.user.avatar ? (
+            (message.user.avatar !== "http://img" ? (
               <Image
                 src={message.user.avatar!}
                 alt={message.user.username}
