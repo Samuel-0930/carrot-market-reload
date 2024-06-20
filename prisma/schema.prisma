@@ -23,7 +23,7 @@ model User {
   comments   Comment[]
   likes      Like[]
   chat_rooms ChatRoom[]
-  messages    Message[]
+  messages   Message[]
 }
 
 model SMSToken {
@@ -95,8 +95,8 @@ model Message {
   payload    String
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  room       ChatRoom @relation(fields: [chatRoomId], references: [id])
+  room       ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
   chatRoomId String
-  user       User     @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     Int
 }
