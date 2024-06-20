@@ -24,7 +24,6 @@ const getIsOwner = async (userId: number) => {
 };
 
 const getProduct = async (id: number) => {
-  console.log("product");
   const product = await db.product.findUnique({
     where: {
       id,
@@ -42,7 +41,6 @@ const getProduct = async (id: number) => {
 };
 
 const getProductTitle = async (id: number) => {
-  console.log("title");
   const product = await db.product.findUnique({
     where: {
       id,
@@ -102,6 +100,27 @@ const ProductDetail: React.FC<Props> = async ({ params }) => {
     redirect("/home");
   };
 
+  const createChatRoom = async () => {
+    "use server";
+    const session = await getSession();
+    const room = await db.chatRoom.create({
+      data: {
+        users: {
+          connect: [
+            { id: product.userId },
+            {
+              id: session.id,
+            },
+          ],
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+    redirect(`/chats/${room.id}`);
+  };
+
   return (
     <div>
       <div className="relative aspect-square">
@@ -152,12 +171,11 @@ const ProductDetail: React.FC<Props> = async ({ params }) => {
             Edit product
           </Link>
         )}
-        <Link
-          className="rounded-md bg-orange-500 px-5 py-2.5 font-semibold text-white transition-colors hover:bg-orange-400"
-          href={``}
-        >
-          채팅하기
-        </Link>
+        <form action={createChatRoom}>
+          <button className="rounded-md bg-orange-500 px-5 py-2.5 font-semibold text-white transition-colors hover:bg-orange-400">
+            채팅하기
+          </button>
+        </form>
       </div>
     </div>
   );

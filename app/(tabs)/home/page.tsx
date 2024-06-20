@@ -11,7 +11,6 @@ const getCachedProducts = nextCache(getInitialProducts, ["home-products"]);
 export const revalidate = 30;
 
 async function getInitialProducts() {
-  console.log("hit!!");
   const products = await db.product.findMany({
     select: {
       title: true,

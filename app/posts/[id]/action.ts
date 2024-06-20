@@ -3,6 +3,7 @@
 import { revalidateTag } from "next/cache";
 import db from "../../../lib/db";
 import getSession from "../../../lib/session";
+import { postType } from "./schema";
 
 export const likePost = async (postId: number) => {
   await new Promise((resolve) => setTimeout(resolve, 5000));

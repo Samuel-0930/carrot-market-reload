@@ -1,16 +1,14 @@
-import { notFound } from "next/navigation";
-import db from "../../../lib/db";
+import { EyeIcon, UserCircleIcon } from "@heroicons/react/24/solid";
+import { unstable_cache as nextCache } from "next/cache";
 import Image from "next/image";
-import { formatToTomeAgo } from "../../../lib/utils";
-import { EyeIcon, HandThumbUpIcon } from "@heroicons/react/24/solid";
-import { HandThumbUpIcon as OutlineHandThumbUpIcon } from "@heroicons/react/24/outline";
-import getSession from "../../../lib/session";
-import {
-  revalidatePath,
-  unstable_cache as nextCache,
-  revalidateTag,
-} from "next/cache";
+import { notFound } from "next/navigation";
 import LikeButton from "../../../components/LikeButton";
+import db from "../../../lib/db";
+import getSession from "../../../lib/session";
+import { formatToTomeAgo } from "../../../lib/utils";
+import CommentForm from "../../../components/CommentForm";
+import CommentBox from "../../../components/CommentBox";
+import CommentField from "../../../components/CommentField";
 
 type Props = {
   params: {
@@ -55,7 +53,6 @@ const getCachedPost = nextCache(getPost, ["post-detail"], {
 });
 
 async function getLikeStatus(postId: number, userId: number) {
-  // const session = await getSession();
   const isLiked = await db.like.findUnique({
     where: {
       id: {
@@ -84,6 +81,55 @@ async function getCachedLikeStatus(postId: number) {
   return cachedOperation(postId, userId!);
 }
 
+export type IComment = {
+  id: number;
+  user: {
+    avatar: string | null;
+    username: string;
+  };
+  payload: string;
+};
+
+const getComments = async (postId: number): Promise<IComment[]> => {
+  const comments = await db.comment.findMany({
+    where: {
+      postId,
+    },
+    select: {
+      id: true,
+      payload: true,
+      user: {
+        select: {
+          username: true,
+          avatar: true,
+        },
+      },
+    },
+  });
+
+  return comments;
+};
+
+const getCachedComments = nextCache(getComments, ["comments"], {
+  tags: ["post-comments"],
+  revalidate: 60,
+});
+
+const findUser = async () => {
+  const session = await getSession();
+  const currentUser = await db.user.findUnique({
+    where: {
+      id: session.id,
+    },
+    select: {
+      id: true,
+      username: true,
+      avatar: true,
+    },
+  });
+  return currentUser;
+};
+
 const PostDetail: React.FC<Props> = async ({ params }) => {
   const id = +params.id;
 
@@ -99,8 +145,11 @@ const PostDetail: React.FC<Props> = async ({ params }) => {
 
   const { likeCount, isLiked } = await getCachedLikeStatus(id);
 
+  const currentUser = await findUser();
+  const comments = await getCachedComments(id);
+
   return (
-    <div className="p-5 text-white">
+    <div className="flex flex-col gap-3 p-5 text-white">
       <div className="mb-2 flex items-center gap-2">
         <Image
           width={28}
@@ -125,6 +174,11 @@ const PostDetail: React.FC<Props> = async ({ params }) => {
         </div>
         <LikeButton isLiked={isLiked} likeCount={likeCount} postId={id} />
       </div>
+      <CommentField
+        postId={id}
+        comments={comments}
+        currentUser={currentUser!}
+      />
     </div>
   );
 };
